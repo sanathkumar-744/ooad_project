@@ -80,24 +80,6 @@ class Player extends Person {
     }
 }
 
-class Coach extends Person {
-    private int experienceYears;
-
-    public Coach(String name, int age, int experienceYears) {
-        super(name, age);
-        this.experienceYears = experienceYears;
-    }
-
-    public int getExperienceYears() {
-        return experienceYears;
-    }
-
-    @Override
-    public String toString() {
-        return super.toString() + ", Experience: " + experienceYears + " years";
-    }
-}
-
 class Match {
     private String opponent;
     private Map<String, Integer> playerRunsMap;
@@ -128,6 +110,24 @@ class Match {
     }
 }
 
+class Coach extends Person {
+    private int experienceYears;
+
+    public Coach(String name, int age, int experienceYears) {
+        super(name, age);
+        this.experienceYears = experienceYears;
+    }
+
+    public int getExperienceYears() {
+        return experienceYears;
+    }
+
+    @Override
+    public String toString() {
+        return super.toString() + ", Experience: " + experienceYears + " years";
+    }
+}
+
 class Club {
     private String name;
     private java.util.List<Player> players;
@@ -153,6 +153,10 @@ class Club {
         players.remove(player);
     }
 
+    public java.util.List<Player> getPlayers() {
+        return new ArrayList<>(players);
+    }
+
     public void addCoach(Coach newCoach) {
         this.coach = newCoach;
     }
@@ -163,10 +167,6 @@ class Club {
 
     public Coach getCoach() {
         return coach;
-    }
-
-    public java.util.List<Player> getPlayers() {
-        return new ArrayList<>(players);
     }
 
     public void scheduleMatch(String opponent) {
@@ -226,7 +226,7 @@ public class Main {
             @Override
             protected void paintComponent(Graphics g) {
                 super.paintComponent(g);
-                ImageIcon imageIcon = new ImageIcon("cricket.jpg"); // Replace 'background.jpg' with your image path
+                ImageIcon imageIcon = new ImageIcon("cricket.jpg");
                 Image image = imageIcon.getImage();
                 g.drawImage(image, 0, 0, getWidth(), getHeight(), this);
             }
@@ -250,16 +250,6 @@ public class Main {
         panel.add(removeButton);
         panel.add(Box.createRigidArea(new Dimension(0, 20)));
 
-        JButton displayButton = createStyledButton("Display Squad");
-        displayButton.addActionListener(e -> displaySquadDialog(frame));
-        panel.add(displayButton);
-        panel.add(Box.createRigidArea(new Dimension(0, 20)));
-
-        JButton matchButton = createStyledButton("Schedule Match");
-        matchButton.addActionListener(e -> scheduleMatchDialog(frame));
-        panel.add(matchButton);
-        panel.add(Box.createRigidArea(new Dimension(0, 20)));
-
         JButton addCoachButton = createStyledButton("Add Coach");
         addCoachButton.addActionListener(e -> addCoachDialog(frame));
         panel.add(addCoachButton);
@@ -268,6 +258,16 @@ public class Main {
         JButton removeCoachButton = createStyledButton("Remove Coach");
         removeCoachButton.addActionListener(e -> removeCoachDialog(frame));
         panel.add(removeCoachButton);
+        panel.add(Box.createRigidArea(new Dimension(0, 20)));
+
+        JButton displayButton = createStyledButton("Display Squad");
+        displayButton.addActionListener(e -> displaySquadDialog(frame));
+        panel.add(displayButton);
+        panel.add(Box.createRigidArea(new Dimension(0, 20)));
+
+        JButton matchButton = createStyledButton("Schedule Match");
+        matchButton.addActionListener(e -> scheduleMatchDialog(frame));
+        panel.add(matchButton);
         panel.add(Box.createRigidArea(new Dimension(0, 20)));
 
         JButton calculateRunsButton = createStyledButton("Calculate Runs Against Opponent");
