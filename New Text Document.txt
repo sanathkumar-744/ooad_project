@@ -1,0 +1,314 @@
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.*;
+import java.util.*;
+
+class Person {
+    protected String name;
+    protected int age;
+
+    public Person(String name, int age) {
+        this.name = name;
+        this.age = age;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public int getAge() {
+        return age;
+    }
+
+    @Override
+    public String toString() {
+        return "Name: " + name + ", Age: " + age;
+    }
+}
+
+class Player extends Person {
+    private String role;
+    private int matchesPlayed;
+    private int runsScored;
+    private int wicketsTaken;
+
+    public Player(String name, int age, String role) {
+        super(name, age);
+        this.role = role;
+        this.matchesPlayed = 0;
+        this.runsScored = 0;
+        this.wicketsTaken = 0;
+    }
+
+    public String getRole() {
+        return role;
+    }
+
+    public void playMatch(int runsScored, int wicketsTaken) {
+        matchesPlayed++;
+        this.runsScored += runsScored;
+        this.wicketsTaken += wicketsTaken;
+    }
+
+    public int getMatchesPlayed() {
+        return matchesPlayed;
+    }
+
+    public int getRunsScored() {
+        return runsScored;
+    }
+
+    public int getWicketsTaken() {
+        return wicketsTaken;
+    }
+
+    @Override
+    public String toString() {
+        return super.toString() + ", Role: " + role + ", Matches Played: " + matchesPlayed +
+                ", Runs Scored: " + runsScored + ", Wickets Taken: " + wicketsTaken;
+    }
+}
+
+class Coach extends Person {
+    private int experienceYears;
+
+    public Coach(String name, int age, int experienceYears) {
+        super(name, age);
+        this.experienceYears = experienceYears;
+    }
+
+    public int getExperienceYears() {
+        return experienceYears;
+    }
+
+    @Override
+    public String toString() {
+        return super.toString() + ", Experience: " + experienceYears + " years";
+    }
+}
+
+class Match {
+    private String opponent;
+    private Map<String, Integer> playerRunsMap;
+    private Map<String, Integer> playerWicketsMap;
+
+    public Match(String opponent) {
+        this.opponent = opponent;
+        playerRunsMap = new HashMap<>();
+        playerWicketsMap = new HashMap<>();
+    }
+
+    public void addPlayerPerformance(Player player, int runsScored, int wicketsTaken) {
+        playerRunsMap.put(player.getName(), runsScored);
+        playerWicketsMap.put(player.getName(), wicketsTaken);
+        player.playMatch(runsScored, wicketsTaken);
+    }
+
+    public String getOpponent() {
+        return opponent;
+    }
+
+    public Map<String, Integer> getPlayerRunsMap() {
+        return new HashMap<>(playerRunsMap);
+    }
+
+    public Map<String, Integer> getPlayerWicketsMap() {
+        return new HashMap<>(playerWicketsMap);
+    }
+}
+
+class Club {
+    private String name;
+    private List<Player> players;
+    private Coach coach;
+    private List<Match> matches;
+
+    public Club(String name, Coach coach) {
+        this.name = name;
+        this.coach = coach;
+        this.players = new ArrayList<>();
+        this.matches = new ArrayList<>();
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void addPlayer(Player player) {
+        players.add(player);
+    }
+
+    public void removePlayer(Player player) {
+        players.remove(player);
+    }
+
+    public void addCoach(Coach newCoach) {
+        this.coach = newCoach;
+    }
+
+    public void removeCoach() {
+        this.coach = null;
+    }
+
+    public Coach getCoach() {
+        return coach;
+    }
+
+    public List<Player> getPlayers() {
+        return new ArrayList<>(players);
+    }
+
+    public void scheduleMatch(String opponent) {
+        matches.add(new Match(opponent));
+    }
+
+    public void recordMatchPerformance(Match match, Player player, int runsScored, int wicketsTaken) {
+        match.addPlayerPerformance(player, runsScored, wicketsTaken);
+    }
+
+    public void displaySquad() {
+        System.out.println("Club: " + name);
+        System.out.println("Coach: " + coach);
+        System.out.println("Players:");
+        for (Player player : players) {
+            System.out.println(player);
+        }
+    }
+
+    public void displayMatches() {
+        System.out.println("Matches Scheduled:");
+        for (Match match : matches) {
+            System.out.println("Opponent: " + match.getOpponent());
+        }
+    }
+
+    public List<Match> getMatches() {
+        return new ArrayList<>(matches);
+    }
+}
+
+public class Main {
+    private static Club club;
+
+    public static void main(String[] args) {
+        SwingUtilities.invokeLater(Main::createAndShowGUI);
+    }
+
+    private static void createAndShowGUI() {
+        JFrame frame = new JFrame("Cricket Club Management System");
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+        JPanel panel = new JPanel();
+        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+
+        JLabel titleLabel = new JLabel("Welcome to the Cricket Club Management System");
+        titleLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        panel.add(titleLabel);
+
+        JButton addButton = new JButton("Add Player");
+        addButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+        addButton.addActionListener(e -> addPlayerDialog(frame));
+        panel.add(addButton);
+
+        JButton removeButton = new JButton("Remove Player");
+        removeButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+        removeButton.addActionListener(e -> removePlayerDialog(frame));
+        panel.add(removeButton);
+
+        JButton displayButton = new JButton("Display Squad");
+        displayButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+        displayButton.addActionListener(e -> displaySquadDialog(frame));
+        panel.add(displayButton);
+
+        JButton matchButton = new JButton("Schedule Match");
+        matchButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+        matchButton.addActionListener(e -> scheduleMatchDialog(frame));
+        panel.add(matchButton);
+
+        frame.add(panel);
+        frame.pack();
+        frame.setLocationRelativeTo(null); // Center the frame
+        frame.setVisible(true);
+
+        // Initialize the club
+        club = new Club("Cricket Club", null);
+    }
+
+    private static void addPlayerDialog(JFrame parentFrame) {
+        JTextField nameField = new JTextField(10);
+        JTextField ageField = new JTextField(5);
+        JTextField roleField = new JTextField(10);
+
+        JPanel panel = new JPanel(new GridLayout(0, 1));
+        panel.add(new JLabel("Name:"));
+        panel.add(nameField);
+        panel.add(new JLabel("Age:"));
+        panel.add(ageField);
+        panel.add(new JLabel("Role:"));
+        panel.add(roleField);
+
+        int result = JOptionPane.showConfirmDialog(parentFrame, panel, "Add Player", JOptionPane.OK_CANCEL_OPTION);
+        if (result == JOptionPane.OK_OPTION) {
+            try {
+                String name = nameField.getText().trim();
+                int age = Integer.parseInt(ageField.getText().trim());
+                String role = roleField.getText().trim();
+                Player player = new Player(name, age, role);
+                club.addPlayer(player);
+                JOptionPane.showMessageDialog(parentFrame, "Player added successfully.");
+            } catch (NumberFormatException e) {
+                JOptionPane.showMessageDialog(parentFrame, "Invalid input. Please enter valid data.", "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        }
+    }
+
+    private static void removePlayerDialog(JFrame parentFrame) {
+        if (club.getPlayers().isEmpty()) {
+            JOptionPane.showMessageDialog(parentFrame, "No players to remove.", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        JComboBox<Player> playerComboBox = new JComboBox<>(club.getPlayers().toArray(new Player[0]));
+
+        JPanel panel = new JPanel(new GridLayout(0, 1));
+        panel.add(new JLabel("Select Player:"));
+        panel.add(playerComboBox);
+
+        int result = JOptionPane.showConfirmDialog(parentFrame, panel, "Remove Player", JOptionPane.OK_CANCEL_OPTION);
+        if (result == JOptionPane.OK_OPTION) {
+            Player selectedPlayer = (Player) playerComboBox.getSelectedItem();
+            club.removePlayer(selectedPlayer);
+            JOptionPane.showMessageDialog(parentFrame, "Player removed successfully.");
+        }
+    }
+
+    private static void displaySquadDialog(JFrame parentFrame) {
+        JTextArea textArea = new JTextArea(10, 30);
+        textArea.setEditable(false);
+        JScrollPane scrollPane = new JScrollPane(textArea);
+
+        StringBuilder squadInfo = new StringBuilder("Club: " + club.getName() + "\n");
+        squadInfo.append("Players:\n");
+        for (Player player : club.getPlayers()) {
+            squadInfo.append(player.toString()).append("\n");
+        }
+        textArea.setText(squadInfo.toString());
+
+        JOptionPane.showMessageDialog(parentFrame, scrollPane, "Club Squad", JOptionPane.INFORMATION_MESSAGE);
+    }
+
+    private static void scheduleMatchDialog(JFrame parentFrame) {
+        JTextField opponentField = new JTextField(20);
+
+        JPanel panel = new JPanel(new GridLayout(0, 1));
+        panel.add(new JLabel("Opponent:"));
+        panel.add(opponentField);
+
+        int result = JOptionPane.showConfirmDialog(parentFrame, panel, "Schedule Match", JOptionPane.OK_CANCEL_OPTION);
+        if (result == JOptionPane.OK_OPTION) {
+            String opponent = opponentField.getText().trim();
+            club.scheduleMatch(opponent);
+            JOptionPane.showMessageDialog(parentFrame, "Match against " + opponent + " scheduled successfully.");
+        }
+    }
+}
